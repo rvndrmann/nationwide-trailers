@@ -45,7 +45,7 @@
 <!-- WHO WE ARE -->
 <section class="section">
   <div class="container">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;">
+    <div class="who-we-are-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;">
       <div>
         <h2 class="section-title">Who <span class="yellow">We Are</span></h2>
         <div class="divider divider-left"></div>
@@ -53,7 +53,7 @@
         <p style="color: var(--gray); margin-bottom: 20px;">We work with operators across construction, mining, agriculture, logistics, and general freight — providing the right trailer for the job, backed by professional maintenance and around-the-clock support.</p>
         <p style="color: var(--gray);">From inner-city Perth deliveries to remote Pilbara mine sites, our fleet and service capability is built to perform wherever Western Australia's industries operate.</p>
       </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div class="about-stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
         <div style="background: var(--off-white); border: 1px solid var(--gray-light); border-radius: 8px; padding: 28px; text-align: center; border-top: 3px solid var(--yellow);">
           <div style="font-size: 2.5rem; font-weight: 900; color: var(--yellow-dark);">WA</div>
           <div style="color: var(--gray); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 6px;">Wide Service</div>
@@ -81,7 +81,7 @@
     <h2 class="section-title">Our <span class="yellow">Mission</span></h2>
     <div class="divider"></div>
     <p style="color: var(--gray); font-size: 1.2rem; max-width: 700px; margin: 0 auto 48px; line-height: 1.8;">To provide Western Australian businesses with dependable, professionally maintained semi trailer hire solutions that reduce operational costs, increase fleet flexibility, and support business growth — backed by responsive, around-the-clock service.</p>
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 900px; margin: 0 auto;">
+    <div class="mission-cards" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 900px; margin: 0 auto;">
       <div style="background: rgba(255,205,17,0.05); border: 1px solid rgba(255,205,17,0.2); border-radius: 8px; padding: 28px;">
         <div style="font-size: 2rem; margin-bottom: 12px;">🛡️</div>
         <h3 style="margin-bottom: 8px;">Reliability</h3>
@@ -146,7 +146,7 @@
       <div class="divider"></div>
       <p class="section-subtitle">Smart businesses choose hire. Here's why renting from Nationwide makes operational and financial sense.</p>
     </div>
-    <div style="max-width: 800px; margin: 0 auto;">
+    <div class="compare-table-wrap" style="max-width: 800px; margin: 0 auto;">
       <table class="compare-table">
         <thead>
           <tr>
@@ -237,7 +237,13 @@
 <script>
   const toggle = document.getElementById('navToggle');
   const links = document.getElementById('navLinks');
-  toggle.addEventListener('click', () => links.classList.toggle('open'));
+  toggle.addEventListener('click', () => {
+    links.classList.toggle('open');
+    toggle.classList.toggle('open');
+  });
+  links.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => { links.classList.remove('open'); toggle.classList.remove('open'); });
+  });
 </script>
 </body>
 </html>
