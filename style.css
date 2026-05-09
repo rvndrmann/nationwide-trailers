@@ -130,7 +130,7 @@ ul { list-style: none; }
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 1000;
-  background: #000;
+  background: linear-gradient(180deg, #242424 0%, #151515 100%);
   border-bottom: 3px solid var(--yellow);
   box-shadow: 0 2px 16px rgba(0,0,0,0.24);
 }
@@ -983,7 +983,7 @@ ul { list-style: none; }
   .nav-links {
     display: none; flex-direction: column;
     position: fixed; top: 64px; left: 0; right: 0;
-    background: #000;
+    background: linear-gradient(180deg, #242424 0%, #151515 100%);
     border-top: 1px solid rgba(255,255,255,0.12);
     border-bottom: 2px solid var(--yellow);
     padding: 16px; gap: 4px;
