@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Locations | Nationwide Semi Trailer Hire &amp; Equipments</title>
+  <meta name="description" content="Find Nationwide Semi Trailer Hire & Equipments locations across Western Australia. Perth-based, servicing all of WA.">
+  <link rel="stylesheet" href="style.css">
+  <!-- Leaflet map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    /* ── Location-specific styles ── */
+    .phone-banner {
+      background: var(--yellow);
+      padding: 18px 0;
+      text-align: center;
+    }
+    .phone-banner a {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--black);
+      letter-spacing: 1px;
+    }
+    .phone-banner span {
+      display: block;
+      font-size: 0.8rem;
+      color: rgba(0,0,0,0.6);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .wa-map-wrap {
+      background: var(--off-white);
+      border-bottom: 1px solid var(--gray-light);
+      padding: 40px 0;
+      text-align: center;
+    }
+    .wa-map-inner {
+      display: inline-flex;
+      align-items: center;
+      gap: 48px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .wa-map-svg {
+      width: 160px;
+      opacity: 0.18;
+    }
+    .wa-regions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px 24px;
+      text-align: left;
+    }
+    .wa-region-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-body);
+      font-size: 0.88rem;
+      padding: 5px 0;
+    }
+    .wa-region-tag::before {
+      content: '';
+      width: 7px; height: 7px;
+      background: var(--yellow-dark);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Location cards */
+    .loc-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+    .loc-card {
+      background: var(--white);
+      border: 1px solid var(--gray-light);
+      border-top: 4px solid var(--yellow);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+    }
+    .loc-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+    .loc-card-header {
+      background: var(--off-white);
+      padding: 20px 22px 16px;
+      border-bottom: 1px solid var(--gray-light);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .loc-icon {
+      width: 44px; height: 44px;
+      background: var(--yellow);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .loc-icon svg { width: 22px; height: 22px; color: var(--black); }
+    .loc-card-header h3 {
+      font-size: 1.0rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      line-height: 1.25;
+    }
+    .loc-card-header p {
+      font-size: 0.8rem;
+      color: var(--gray-mid);
+      margin-top: 2px;
+    }
+    .loc-card-body {
+      padding: 20px 22px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .loc-detail {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.88rem;
+      color: var(--text-body);
+    }
+    .loc-detail svg {
+      width: 15px; height: 15px;
+      color: var(--yellow-dark);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .loc-card-footer {
+      padding: 16px 22px;
+      border-top: 1px solid var(--gray-light);
+      display: flex;
+      gap: 10px;
+    }
+    .loc-card-footer .btn {
+      flex: 1;
+      text-align: center;
+      padding: 11px 12px;
+      font-size: 0.82rem;
+    }
+    .loc-empty {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--gray-mid);
+    }
+    .loc-empty svg { width: 48px; height: 48px; margin: 0 auto 16px; opacity: 0.3; }
+
+    @media (max-width: 1024px) { .loc-grid { grid-template-columns: 1fr 1fr; } .wa-regions { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 600px)  { .loc-grid { grid-template-columns: 1fr; } .wa-regions { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="logo" aria-label="Nationwide Semi Trailer Hire & Equipments home">
+      <img src="images/header-03-trailer-N-divider.png" alt="Nationwide Semi Trailer Hire & Equipments" class="logo-img">
+    </a>
+    <div class="nav-toggle" id="navToggle"><span></span><span></span><span></span></div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="fleet.html">Fleet</a></li>
+      <li><a href="locations.html" class="active">Locations</a></li>
+      <li><a href="faq.html">FAQ</a></li>
+      <li><a href="contact.html" class="nav-cta">Get a Quote</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a><span>/</span><span>Locations</span>
+    </div>
+    <h1>Our <span>Locations</span></h1>
+    <p>Perth &amp; Melbourne — servicing businesses right across Australia with heavy duty trailer hire solutions.</p>
+  </div>
+</section>
+
+<!-- PHONE BANNER -->
+<div class="phone-banner">
+  <span>Call us anytime</span>
+  <a href="tel:1300XXXXXX">1300 XXX XXX</a>
+</div>
+
+<!-- AUSTRALIA MAP -->
+<div style="background: var(--off-white); border-bottom: 1px solid var(--gray-light); padding: 48px 0;">
+  <div class="container">
+    <div class="text-center" style="margin-bottom: 28px;">
+      <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;color:var(--yellow-dark);font-weight:700;margin-bottom:8px;">Our Locations</div>
+      <div style="font-size:1.6rem;font-weight:900;color:var(--text-dark);">Australia-Wide Coverage</div>
+      <div style="color:var(--gray);font-size:0.95rem;margin-top:6px;">Perth &amp; Melbourne — servicing every state and territory.</div>
+    </div>
+    <div id="aus-map" style="width:100%;height:480px;border-radius:10px;border:2px solid var(--gray-light);box-shadow:var(--shadow-md);overflow:hidden;"></div>
+  </div>
+</div>
+
+<!-- LOCATIONS GRID -->
+<section class="section">
+  <div class="container">
+    <div class="text-center" style="margin-bottom: 48px;">
+      <h2 class="section-title">Find <span class="yellow">Our Locations</span></h2>
+      <div class="divider"></div>
+    </div>
+    <div class="loc-grid" id="locGrid">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<div class="cta-banner">
+  <div class="container">
+    <h2>Not Sure Which Location to Contact?</h2>
+    <p>Call our main line or submit a quote request — we'll connect you with the right team.</p>
+    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+      <a href="contact.html" class="btn btn-primary">Get a Free Quote</a>
+      <a href="tel:1300XXXXXX" class="btn btn-outline">Call 1300 XXX XXX</a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <div class="logo">
+        <span class="logo-main">Nationwide</span>
+        <span class="logo-sub">Semi Trailer Hire &amp; Equipments</span>
+        <span class="logo-tagline">— Heavy Duty Solutions —</span>
+      </div>
+      <p>Western Australia's trusted semi trailer hire specialists. Perth-based, servicing all of WA with professional-grade equipment and 24/7 support.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="fleet.html">Our Fleet</a></li>
+        <li><a href="locations.html">Locations</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Our Fleet</h4>
+      <ul>
+        <li><a href="fleet.html">Flat Top Trailers</a></li>
+        <li><a href="fleet.html">Tautliner Trailers</a></li>
+        <li><a href="fleet.html">Low Loader Trailers</a></li>
+        <li><a href="fleet.html">Drop Deck Trailers</a></li>
+        <li><a href="fleet.html">Tipper Trailers</a></li>
+        <li><a href="fleet.html">Refrigerated Trailers</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact Us</h4>
+      <div class="footer-contact-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        <span>1300 XXX XXX</span>
+      </div>
+      <div class="footer-contact-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <span>info@nationwidetrailers.com.au</span>
+      </div>
+      <div class="footer-contact-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Perth, Western Australia</span>
+      </div>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <p>&copy; 2025 Nationwide Semi Trailer Hire &amp; Equipments. All rights reserved.</p>
+    <p>Perth, Western Australia</p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // ── Australia Map ──
+  const map = L.map('aus-map', {
+    center: [-27.5, 133.5],
+    zoom: 4,
+    zoomControl: true,
+    scrollWheelZoom: false
+  });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 18
+  }).addTo(map);
+
+  // Custom yellow pin icon
+  const yellowIcon = L.divIcon({
+    className: '',
+    html: `<div style="
+      width:36px;height:36px;
+      background:#FFCD11;
+      border:3px solid #1a1a1a;
+      border-radius:50% 50% 50% 0;
+      transform:rotate(-45deg);
+      box-shadow:0 3px 10px rgba(0,0,0,0.35);
+    "></div>`,
+    iconSize: [36, 36],
+    iconAnchor: [18, 36],
+    popupAnchor: [0, -38]
+  });
+
+  // Perth marker
+  L.marker([-31.9505, 115.8605], { icon: yellowIcon })
+    .addTo(map)
+    .bindPopup(`
+      <div style="font-family:sans-serif;min-width:180px;">
+        <div style="font-weight:800;font-size:1rem;margin-bottom:4px;">Perth — Head Office</div>
+        <div style="font-size:0.82rem;color:#555;">Western Australia</div>
+        <div style="font-size:0.82rem;color:#555;margin-top:4px;">📞 1300 XXX XXX</div>
+        <a href="contact.html" style="display:inline-block;margin-top:10px;background:#FFCD11;color:#1a1a1a;font-weight:700;padding:6px 14px;border-radius:4px;font-size:0.8rem;text-decoration:none;">Get a Quote</a>
+      </div>
+    `, { maxWidth: 220 });
+
+  // Melbourne marker
+  L.marker([-37.8136, 144.9631], { icon: yellowIcon })
+    .addTo(map)
+    .bindPopup(`
+      <div style="font-family:sans-serif;min-width:180px;">
+        <div style="font-weight:800;font-size:1rem;margin-bottom:4px;">Melbourne</div>
+        <div style="font-size:0.82rem;color:#555;">Victoria</div>
+        <div style="font-size:0.82rem;color:#555;margin-top:4px;">📞 1300 XXX XXX</div>
+        <a href="contact.html" style="display:inline-block;margin-top:10px;background:#FFCD11;color:#1a1a1a;font-weight:700;padding:6px 14px;border-radius:4px;font-size:0.8rem;text-decoration:none;">Get a Quote</a>
+      </div>
+    `, { maxWidth: 220 });
+
+  // ── Navbar ──
+  const toggle = document.getElementById('navToggle');
+  const links  = document.getElementById('navLinks');
+  toggle.addEventListener('click', () => { links.classList.toggle('open'); toggle.classList.toggle('open'); });
+  links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { links.classList.remove('open'); toggle.classList.remove('open'); }));
+
+  // ── Render location cards ──
+  const PIN_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+  const PHONE_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>`;
+  const CLOCK_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+  const EMAIL_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`;
+
+  // Default head-office location (always shown)
+  const DEFAULT_LOCATIONS = [
+    {
+      id: 'default_perth',
+      name: 'Perth — Head Office',
+      type: 'Head Office',
+      address: '[Address Line 1]',
+      suburb: 'Perth',
+      state: 'WA',
+      postcode: '6000',
+      phone: '1300 XXX XXX',
+      email: 'info@nationwidetrailers.com.au',
+      hours: 'Mon–Fri  7:00 AM – 5:00 PM AWST',
+      support: '24/7 Breakdown Support',
+      directions: 'https://maps.google.com/?q=Perth,WA',
+      isDefault: true
+    },
+    {
+      id: 'default_melbourne',
+      name: 'Melbourne',
+      type: 'Service Location',
+      address: '[Address Line 1]',
+      suburb: 'Melbourne',
+      state: 'VIC',
+      postcode: '3000',
+      phone: '1300 XXX XXX',
+      email: 'info@nationwidetrailers.com.au',
+      hours: 'Mon–Fri  7:00 AM – 5:00 PM AEST',
+      support: '24/7 Breakdown Support',
+      directions: 'https://maps.google.com/?q=Melbourne,VIC',
+      isDefault: true
+    }
+  ];
+
+  function renderLocations() {
+    const grid = document.getElementById('locGrid');
+    const stored = JSON.parse(localStorage.getItem('nw_locations') || '[]');
+    const all = [...DEFAULT_LOCATIONS, ...stored];
+
+    if (all.length === 0) {
+      grid.innerHTML = `<div class="loc-empty">${PIN_SVG}<p>No locations found.</p></div>`;
+      return;
+    }
+
+    grid.innerHTML = all.map(loc => `
+      <div class="loc-card">
+        <div class="loc-card-header">
+          <div class="loc-icon">${PIN_SVG}</div>
+          <div>
+            <h3>${escHtml(loc.name)}</h3>
+            <p>${escHtml(loc.type || 'Service Location')}</p>
+          </div>
+        </div>
+        <div class="loc-card-body">
+          <div class="loc-detail">${PIN_SVG}<span>${escHtml(loc.address)}, ${escHtml(loc.suburb)} ${escHtml(loc.state)} ${escHtml(loc.postcode)}</span></div>
+          ${loc.phone ? `<div class="loc-detail">${PHONE_SVG}<span><a href="tel:${loc.phone.replace(/\s/g,'')}" style="color:inherit;">${escHtml(loc.phone)}</a></span></div>` : ''}
+          ${loc.email ? `<div class="loc-detail">${EMAIL_SVG}<span><a href="mailto:${escHtml(loc.email)}" style="color:inherit;">${escHtml(loc.email)}</a></span></div>` : ''}
+          ${loc.hours ? `<div class="loc-detail">${CLOCK_SVG}<span>${escHtml(loc.hours)}</span></div>` : ''}
+          ${loc.support ? `<div class="loc-detail">${CLOCK_SVG}<span style="color:var(--yellow-dark);font-weight:600;">${escHtml(loc.support)}</span></div>` : ''}
+        </div>
+        <div class="loc-card-footer">
+          <a href="${escHtml(loc.directions || 'https://maps.google.com/?q=' + encodeURIComponent(loc.address + ' ' + loc.suburb + ' ' + loc.state))}" target="_blank" rel="noopener" class="btn btn-outline">Get Directions</a>
+          <a href="contact.html" class="btn btn-primary">Get a Quote</a>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function escHtml(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  renderLocations();
+</script>
+</body>
+</html>
