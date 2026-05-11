@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Locations | Nationwide Semi Trailer Hire &amp; Equipments</title>
-  <meta name="description" content="Find Nationwide Semi Trailer Hire & Equipments locations across Western Australia. Perth-based, servicing all of WA.">
+  <meta name="description" content="Find Nationwide Semi Trailer Hire & Equipments locations across Australia. Headquartered in Melbourne with offices in Sydney, Brisbane, and Perth.">
   <link rel="stylesheet" href="style.css">
   <!-- Leaflet map -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -192,7 +192,7 @@
       <a href="index.html">Home</a><span>/</span><span>Locations</span>
     </div>
     <h1>Our <span>Locations</span></h1>
-    <p>Perth &amp; Melbourne — servicing businesses right across Australia with heavy duty trailer hire solutions.</p>
+    <p>4 offices nationwide — Melbourne, Sydney, Brisbane, and Perth — servicing businesses right across Australia.</p>
   </div>
 </section>
 
@@ -208,7 +208,7 @@
     <div class="text-center" style="margin-bottom: 28px;">
       <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;color:var(--yellow-dark);font-weight:700;margin-bottom:8px;">Our Locations</div>
       <div style="font-size:1.6rem;font-weight:900;color:var(--text-dark);">Australia-Wide Coverage</div>
-      <div style="color:var(--gray);font-size:0.95rem;margin-top:6px;">Perth &amp; Melbourne — servicing every state and territory.</div>
+      <div style="color:var(--gray);font-size:0.95rem;margin-top:6px;">4 offices nationwide — Melbourne, Sydney, Brisbane, Perth.</div>
     </div>
     <div id="aus-map" style="width:100%;height:480px;border-radius:10px;border:2px solid var(--gray-light);box-shadow:var(--shadow-md);overflow:hidden;"></div>
   </div>
@@ -248,7 +248,7 @@
         <span class="logo-sub">Semi Trailer Hire &amp; Equipments</span>
         <span class="logo-tagline">— Heavy Duty Solutions —</span>
       </div>
-      <p>Western Australia's trusted semi trailer hire specialists. Perth-based, servicing all of WA with professional-grade equipment and 24/7 support.</p>
+      <p>Australia's semi trailer hire specialists. Australia-wide nationwide coverage with offices in Melbourne, Sydney, Brisbane, and Perth. Professional-grade equipment and 24/7 support.</p>
     </div>
     <div class="footer-col">
       <h4>Quick Links</h4>
@@ -268,7 +268,6 @@
         <li><a href="fleet.html">Tautliner Trailers</a></li>
         <li><a href="fleet.html">Low Loader Trailers</a></li>
         <li><a href="fleet.html">Drop Deck Trailers</a></li>
-        <li><a href="fleet.html">Tipper Trailers</a></li>
         <li><a href="fleet.html">Refrigerated Trailers</a></li>
       </ul>
     </div>
@@ -284,13 +283,13 @@
       </div>
       <div class="footer-contact-item">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>Perth, Western Australia</span>
+        <span>Melbourne, Victoria</span>
       </div>
     </div>
   </div>
   <div class="container footer-bottom">
     <p>&copy; 2025 Nationwide Semi Trailer Hire &amp; Equipments. All rights reserved.</p>
-    <p>Perth, Western Australia</p>
+    <p>Melbourne, Victoria</p>
   </div>
 </footer>
 
@@ -325,25 +324,49 @@
     popupAnchor: [0, -38]
   });
 
-  // Perth marker
-  L.marker([-31.9505, 115.8605], { icon: yellowIcon })
+  // Melbourne marker (Head Office)
+  L.marker([-37.8136, 144.9631], { icon: yellowIcon })
     .addTo(map)
     .bindPopup(`
       <div style="font-family:sans-serif;min-width:180px;">
-        <div style="font-weight:800;font-size:1rem;margin-bottom:4px;">Perth — Head Office</div>
-        <div style="font-size:0.82rem;color:#555;">Western Australia</div>
+        <div style="font-weight:800;font-size:1rem;margin-bottom:4px;">Melbourne — Head Office</div>
+        <div style="font-size:0.82rem;color:#555;">Victoria</div>
         <div style="font-size:0.82rem;color:#555;margin-top:4px;">📞 1300 XXX XXX</div>
         <a href="contact.html" style="display:inline-block;margin-top:10px;background:#FFCD11;color:#1a1a1a;font-weight:700;padding:6px 14px;border-radius:4px;font-size:0.8rem;text-decoration:none;">Get a Quote</a>
       </div>
     `, { maxWidth: 220 });
 
-  // Melbourne marker
-  L.marker([-37.8136, 144.9631], { icon: yellowIcon })
+  // Sydney marker
+  L.marker([-33.8688, 151.2093], { icon: yellowIcon })
     .addTo(map)
     .bindPopup(`
       <div style="font-family:sans-serif;min-width:180px;">
-        <div style="font-weight:800;font-size:1rem;margin-bottom:4px;">Melbourne</div>
-        <div style="font-size:0.82rem;color:#555;">Victoria</div>
+        <div style="font-weight:800;font-size:1rem;margin-bottom:4px;">Sydney</div>
+        <div style="font-size:0.82rem;color:#555;">New South Wales</div>
+        <div style="font-size:0.82rem;color:#555;margin-top:4px;">📞 1300 XXX XXX</div>
+        <a href="contact.html" style="display:inline-block;margin-top:10px;background:#FFCD11;color:#1a1a1a;font-weight:700;padding:6px 14px;border-radius:4px;font-size:0.8rem;text-decoration:none;">Get a Quote</a>
+      </div>
+    `, { maxWidth: 220 });
+
+  // Brisbane marker
+  L.marker([-27.4698, 153.0251], { icon: yellowIcon })
+    .addTo(map)
+    .bindPopup(`
+      <div style="font-family:sans-serif;min-width:180px;">
+        <div style="font-weight:800;font-size:1rem;margin-bottom:4px;">Brisbane</div>
+        <div style="font-size:0.82rem;color:#555;">Queensland</div>
+        <div style="font-size:0.82rem;color:#555;margin-top:4px;">📞 1300 XXX XXX</div>
+        <a href="contact.html" style="display:inline-block;margin-top:10px;background:#FFCD11;color:#1a1a1a;font-weight:700;padding:6px 14px;border-radius:4px;font-size:0.8rem;text-decoration:none;">Get a Quote</a>
+      </div>
+    `, { maxWidth: 220 });
+
+  // Perth marker
+  L.marker([-31.9505, 115.8605], { icon: yellowIcon })
+    .addTo(map)
+    .bindPopup(`
+      <div style="font-family:sans-serif;min-width:180px;">
+        <div style="font-weight:800;font-size:1rem;margin-bottom:4px;">Perth</div>
+        <div style="font-size:0.82rem;color:#555;">Western Australia</div>
         <div style="font-size:0.82rem;color:#555;margin-top:4px;">📞 1300 XXX XXX</div>
         <a href="contact.html" style="display:inline-block;margin-top:10px;background:#FFCD11;color:#1a1a1a;font-weight:700;padding:6px 14px;border-radius:4px;font-size:0.8rem;text-decoration:none;">Get a Quote</a>
       </div>
@@ -361,27 +384,12 @@
   const CLOCK_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
   const EMAIL_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`;
 
-  // Default head-office location (always shown)
+  // Default nationwide locations (always shown)
   const DEFAULT_LOCATIONS = [
     {
-      id: 'default_perth',
-      name: 'Perth — Head Office',
-      type: 'Head Office',
-      address: '[Address Line 1]',
-      suburb: 'Perth',
-      state: 'WA',
-      postcode: '6000',
-      phone: '1300 XXX XXX',
-      email: 'info@nationwidetrailers.com.au',
-      hours: 'Mon–Fri  7:00 AM – 5:00 PM AWST',
-      support: '24/7 Breakdown Support',
-      directions: 'https://maps.google.com/?q=Perth,WA',
-      isDefault: true
-    },
-    {
       id: 'default_melbourne',
-      name: 'Melbourne',
-      type: 'Service Location',
+      name: 'Melbourne — Head Office',
+      type: 'Head Office',
       address: '[Address Line 1]',
       suburb: 'Melbourne',
       state: 'VIC',
@@ -391,6 +399,51 @@
       hours: 'Mon–Fri  7:00 AM – 5:00 PM AEST',
       support: '24/7 Breakdown Support',
       directions: 'https://maps.google.com/?q=Melbourne,VIC',
+      isDefault: true
+    },
+    {
+      id: 'default_sydney',
+      name: 'Sydney',
+      type: 'Service Location',
+      address: '[Address Line 1]',
+      suburb: 'Sydney',
+      state: 'NSW',
+      postcode: '2000',
+      phone: '1300 XXX XXX',
+      email: 'info@nationwidetrailers.com.au',
+      hours: 'Mon–Fri  7:00 AM – 5:00 PM AEST',
+      support: '24/7 Breakdown Support',
+      directions: 'https://maps.google.com/?q=Sydney,NSW',
+      isDefault: true
+    },
+    {
+      id: 'default_brisbane',
+      name: 'Brisbane',
+      type: 'Service Location',
+      address: '[Address Line 1]',
+      suburb: 'Brisbane',
+      state: 'QLD',
+      postcode: '4000',
+      phone: '1300 XXX XXX',
+      email: 'info@nationwidetrailers.com.au',
+      hours: 'Mon–Fri  7:00 AM – 5:00 PM AEST',
+      support: '24/7 Breakdown Support',
+      directions: 'https://maps.google.com/?q=Brisbane,QLD',
+      isDefault: true
+    },
+    {
+      id: 'default_perth',
+      name: 'Perth',
+      type: 'Service Location',
+      address: '[Address Line 1]',
+      suburb: 'Perth',
+      state: 'WA',
+      postcode: '6000',
+      phone: '1300 XXX XXX',
+      email: 'info@nationwidetrailers.com.au',
+      hours: 'Mon–Fri  7:00 AM – 5:00 PM AWST',
+      support: '24/7 Breakdown Support',
+      directions: 'https://maps.google.com/?q=Perth,WA',
       isDefault: true
     }
   ];
