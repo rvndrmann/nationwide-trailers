@@ -56,7 +56,7 @@
         </div>
         <div>
           <h4>Phone</h4>
-          <a href="tel:1300XXXXXX">1300 XXX XXX</a>
+          <a href="tel:1300XXXXXX" data-site="phone">1300 XXX XXX</a>
           <p style="margin-top: 4px; font-size: 0.85rem;">Mon–Fri, 7:00 AM – 5:00 PM AEST</p>
         </div>
       </div>
@@ -67,7 +67,7 @@
         </div>
         <div>
           <h4>24/7 Breakdown Support</h4>
-          <a href="tel:1300XXXXXX">1300 XXX XXX</a>
+          <a href="tel:1300XXXXXX" data-site="support_phone">1300 XXX XXX</a>
           <p style="margin-top: 4px; font-size: 0.85rem;">For existing hire customers — available around the clock</p>
         </div>
       </div>
@@ -78,7 +78,7 @@
         </div>
         <div>
           <h4>Email</h4>
-          <a href="mailto:info@nationwidetrailers.com.au">info@nationwidetrailers.com.au</a>
+          <a href="mailto:info@nationwidetrailers.com.au" data-site="email">info@nationwidetrailers.com.au</a>
           <p style="margin-top: 4px; font-size: 0.85rem;">We respond within one business day</p>
         </div>
       </div>
@@ -226,11 +226,11 @@
       <h4>Contact Us</h4>
       <div class="footer-contact-item">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-        <span>1300 XXX XXX</span>
+        <span data-site="phone">1300 XXX XXX</span>
       </div>
       <div class="footer-contact-item">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        <span>info@nationwidetrailers.com.au</span>
+        <span data-site="email">info@nationwidetrailers.com.au</span>
       </div>
       <div class="footer-contact-item">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -244,6 +244,8 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script>
   // Navbar
   const toggle = document.getElementById('navToggle');
@@ -251,36 +253,69 @@
   toggle.addEventListener('click', () => { links.classList.toggle('open'); toggle.classList.toggle('open'); });
   links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { links.classList.remove('open'); toggle.classList.remove('open'); }));
 
-  // Form submit — save to localStorage
-  function handleSubmit(e) {
+  // Form submit — save to Supabase
+  async function handleSubmit(e) {
     e.preventDefault();
     const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+
     const data = {
-      id: 'q_' + Date.now(),
-      date: new Date().toISOString(),
-      status: 'new',
       full_name:         form.full_name.value.trim(),
       company:           form.company.value.trim(),
       phone:             form.phone.value.trim(),
       email:             form.email.value.trim(),
       trailer_type:      form.trailer_type.value,
       hire_duration:     form.hire_duration.value,
-      start_date:        form.start_date.value,
+      start_date:        form.start_date.value || null,
       delivery_location: form.delivery_location.value.trim(),
       message:           form.message.value.trim(),
     };
-    const quotes = JSON.parse(localStorage.getItem('nw_quotes') || '[]');
-    quotes.push(data);
-    localStorage.setItem('nw_quotes', JSON.stringify(quotes));
+
+    const { error } = await db.from('quotes').insert([data]);
+
+    if (error) {
+      console.error('Quote submission error:', error);
+      alert('Something went wrong. Please try again or call us directly.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Quote Request';
+      return;
+    }
+
     form.style.display = 'none';
     document.getElementById('formSuccess').style.display = 'block';
   }
 
   function resetForm() {
-    document.getElementById('quoteForm').reset();
-    document.getElementById('quoteForm').style.display = 'block';
+    const form = document.getElementById('quoteForm');
+    form.reset();
+    form.style.display = 'block';
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit Quote Request';
     document.getElementById('formSuccess').style.display = 'none';
   }
+
+  // Load site settings (phone, email) from Supabase and update page
+  (async () => {
+    try {
+      const { data } = await db.from('site_settings').select('*').eq('id', 1).single();
+      if (!data) return;
+      document.querySelectorAll('[data-site="phone"]').forEach(el => {
+        el.textContent = data.phone;
+        if (el.tagName === 'A') el.href = 'tel:' + data.phone.replace(/\s/g, '');
+      });
+      document.querySelectorAll('[data-site="support_phone"]').forEach(el => {
+        el.textContent = data.support_phone;
+        if (el.tagName === 'A') el.href = 'tel:' + data.support_phone.replace(/\s/g, '');
+      });
+      document.querySelectorAll('[data-site="email"]').forEach(el => {
+        el.textContent = data.email;
+        if (el.tagName === 'A') el.href = 'mailto:' + data.email;
+      });
+    } catch (e) { /* Settings not available — use defaults */ }
+  })();
 </script>
 </body>
 </html>

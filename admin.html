@@ -241,7 +241,7 @@
     <div class="login-logo">Nationwide <span>Admin</span></div>
     <div class="login-sub">Semi Trailer Hire</div>
     <h2>Sign In</h2>
-    <input type="text" id="loginUser" placeholder="Username" autocomplete="username">
+    <input type="email" id="loginUser" placeholder="Email" autocomplete="username">
     <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password">
     <button class="login-btn" onclick="doLogin()">Sign In</button>
     <div class="login-error" id="loginError"></div>
@@ -268,6 +268,10 @@
       <div class="nav-item" onclick="showSection('locations')" id="nav-locations">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
         Manage Locations
+      </div>
+      <div class="nav-item" onclick="showSection('settings')" id="nav-settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Site Settings
       </div>
       <div class="nav-section-label" style="margin-top:16px;">Site</div>
       <a href="index.html" class="nav-item" target="_blank">
@@ -333,7 +337,7 @@
       <div class="topbar">
         <div>
           <h1>Manage Locations</h1>
-          <p>Add or remove locations shown on the public Locations page.</p>
+          <p>All locations shown on the public Locations page. Edit details or add new ones.</p>
         </div>
         <a href="locations.html" target="_blank" class="action-btn btn-mark" style="padding:9px 16px;">View Live Page ↗</a>
       </div>
@@ -345,12 +349,13 @@
           <div id="locListBody"></div>
         </div>
 
-        <!-- Add location form -->
+        <!-- Add / Edit location form -->
         <div class="loc-add-wrap">
-          <h3>+ Add New Location</h3>
+          <h3 id="locFormTitle">+ Add New Location</h3>
+          <input type="hidden" id="locEditId" value="">
           <div class="form-group">
             <label>Location Name *</label>
-            <input type="text" id="locName" placeholder="e.g. Karratha Depot">
+            <input type="text" id="locName" placeholder="e.g. Adelaide Depot">
           </div>
           <div class="form-group">
             <label>Location Type</label>
@@ -363,18 +368,29 @@
             </select>
           </div>
           <div class="form-group">
-            <label>Street Address *</label>
+            <label>Street Address</label>
             <input type="text" id="locAddress" placeholder="e.g. 12 Industrial Drive">
           </div>
           <div class="form-row-2">
             <div class="form-group">
               <label>Suburb *</label>
-              <input type="text" id="locSuburb" placeholder="Karratha">
+              <input type="text" id="locSuburb" placeholder="Adelaide">
             </div>
             <div class="form-group">
-              <label>Postcode *</label>
-              <input type="text" id="locPostcode" placeholder="6714">
+              <label>State *</label>
+              <select id="locState">
+                <option value="VIC">VIC</option>
+                <option value="NSW">NSW</option>
+                <option value="QLD">QLD</option>
+                <option value="WA">WA</option>
+                <option value="SA">SA</option>
+                <option value="ACT">ACT</option>
+              </select>
             </div>
+          </div>
+          <div class="form-group">
+            <label>Postcode *</label>
+            <input type="text" id="locPostcode" placeholder="5000">
           </div>
           <div class="form-group">
             <label>Phone</label>
@@ -386,14 +402,60 @@
           </div>
           <div class="form-group">
             <label>Business Hours</label>
-            <input type="text" id="locHours" placeholder="Mon–Fri 7:00 AM – 5:00 PM AWST">
+            <input type="text" id="locHours" placeholder="Mon–Fri 7:00 AM – 5:00 PM AEST">
           </div>
           <div class="form-group">
             <label>Google Maps URL</label>
             <input type="text" id="locMaps" placeholder="https://maps.google.com/?q=...">
           </div>
-          <button class="submit-loc-btn" onclick="addLocation()">Add Location</button>
+          <button class="submit-loc-btn" id="locSubmitBtn" onclick="saveLocation()">Add Location</button>
+          <button class="submit-loc-btn" id="locCancelBtn" onclick="cancelEditLoc()" style="display:none; background:#eee; color:#555; margin-top:8px;">Cancel Edit</button>
         </div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS SECTION ── -->
+    <div class="page-section" id="section-settings">
+      <div class="topbar">
+        <div>
+          <h1>Site Settings</h1>
+          <p>Update phone numbers and email displayed across the website.</p>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 800px;">
+        <!-- Phone Numbers -->
+        <div class="loc-add-wrap">
+          <h3 style="margin-bottom:20px;">Phone Numbers</h3>
+          <div class="form-group">
+            <label>Main Phone Number *</label>
+            <input type="text" id="settPhone" placeholder="1300 XXX XXX">
+            <p style="font-size:0.75rem; color:var(--gray-mid); margin-top:4px;">Shown on all pages — header, footer, contact page</p>
+          </div>
+          <div class="form-group">
+            <label>24/7 Breakdown Support Number</label>
+            <input type="text" id="settSupport" placeholder="1300 XXX XXX">
+            <p style="font-size:0.75rem; color:var(--gray-mid); margin-top:4px;">Shown on the contact page for existing customers</p>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="loc-add-wrap">
+          <h3 style="margin-bottom:20px;">Email Address</h3>
+          <div class="form-group">
+            <label>Main Email *</label>
+            <input type="email" id="settEmail" placeholder="info@nationwidetrailers.com.au">
+            <p style="font-size:0.75rem; color:var(--gray-mid); margin-top:4px;">Shown on all pages — footer, contact page</p>
+          </div>
+          <div style="background:var(--off-white); border:1px solid var(--gray-light); border-radius:6px; padding:16px; margin-top:20px;">
+            <p style="font-size:0.8rem; color:var(--gray-mid); line-height:1.5;"><strong style="color:var(--text-dark);">How it works:</strong> When you save changes here, the phone number and email will update across all pages on the website automatically.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px; max-width:800px;">
+        <button class="submit-loc-btn" onclick="saveSettings()" style="max-width:260px;">Save Settings</button>
+        <span id="settSaved" style="display:none; margin-left:16px; color:var(--green); font-weight:600; font-size:0.9rem;">✓ Settings saved!</span>
       </div>
     </div>
 
@@ -412,41 +474,50 @@
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script>
-  // ── CONSTANTS ──
-  const ADMIN_USER = 'admin';
-  const ADMIN_PASS = 'nationwide2025';
-  const QUOTES_KEY = 'nw_quotes';
-  const LOCS_KEY   = 'nw_locations';
-  const SESSION_KEY = 'nw_admin_session';
-
   // ── AUTH ──
-  function doLogin() {
-    const u = document.getElementById('loginUser').value.trim();
-    const p = document.getElementById('loginPass').value;
-    if (u === ADMIN_USER && p === ADMIN_PASS) {
-      sessionStorage.setItem(SESSION_KEY, '1');
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('adminApp').style.display = 'block';
-      initApp();
-    } else {
-      document.getElementById('loginError').textContent = 'Incorrect username or password.';
+  async function doLogin() {
+    const email = document.getElementById('loginUser').value.trim();
+    const password = document.getElementById('loginPass').value;
+    const errorEl = document.getElementById('loginError');
+    errorEl.textContent = '';
+
+    if (!email || !password) {
+      errorEl.textContent = 'Please enter email and password.';
+      return;
     }
-  }
-  document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-  document.getElementById('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
-  function doLogout() {
-    sessionStorage.removeItem(SESSION_KEY);
-    location.reload();
-  }
+    const { data, error } = await db.auth.signInWithPassword({ email, password });
 
-  // Auto-login if session exists
-  if (sessionStorage.getItem(SESSION_KEY) === '1') {
+    if (error) {
+      errorEl.textContent = 'Incorrect email or password.';
+      return;
+    }
+
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminApp').style.display = 'block';
     initApp();
   }
+
+  document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  document.getElementById('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+  async function doLogout() {
+    await db.auth.signOut();
+    location.reload();
+  }
+
+  // Auto-login if session exists
+  (async () => {
+    const { data: { session } } = await db.auth.getSession();
+    if (session) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('adminApp').style.display = 'block';
+      initApp();
+    }
+  })();
 
   // ── NAVIGATION ──
   function showSection(name) {
@@ -456,19 +527,15 @@
     document.getElementById('nav-' + name)?.classList.add('active');
     if (name === 'locations') renderLocList();
     if (name === 'quotes') renderQuotes();
+    if (name === 'settings') loadSettings();
   }
 
   // ── INIT ──
   function initApp() {
-    renderStats();
     renderQuotes();
   }
 
   // ── HELPERS ──
-  function getQuotes() { return JSON.parse(localStorage.getItem(QUOTES_KEY) || '[]'); }
-  function saveQuotes(q) { localStorage.setItem(QUOTES_KEY, JSON.stringify(q)); }
-  function getLocs() { return JSON.parse(localStorage.getItem(LOCS_KEY) || '[]'); }
-  function saveLocs(l) { localStorage.setItem(LOCS_KEY, JSON.stringify(l)); }
   function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function fmtDate(d) { return d ? new Date(d).toLocaleDateString('en-AU', {day:'2-digit',month:'short',year:'numeric'}) : '—'; }
 
@@ -481,29 +548,38 @@
   }
 
   // ── STATS ──
-  function renderStats() {
-    const quotes = getQuotes();
-    const newQ   = quotes.filter(q => q.status === 'new').length;
-    const readQ  = quotes.filter(q => q.status === 'read').length;
-    const doneQ  = quotes.filter(q => q.status === 'done').length;
-    const locs   = getLocs();
+  async function renderStats() {
+    const { data: quotes } = await db.from('quotes').select('status');
+    const { data: locs } = await db.from('locations').select('id');
+
+    const newQ  = (quotes || []).filter(q => q.status === 'new').length;
+    const readQ = (quotes || []).filter(q => q.status === 'read').length;
+    const doneQ = (quotes || []).filter(q => q.status === 'done').length;
+    const locCount = (locs || []).length;
 
     document.getElementById('newBadge').textContent = newQ;
     document.getElementById('statsRow').innerHTML = `
       <div class="stat-card red"><div class="s-label">New Requests</div><div class="s-value">${newQ}</div></div>
       <div class="stat-card blue"><div class="s-label">In Progress</div><div class="s-value">${readQ}</div></div>
       <div class="stat-card green"><div class="s-label">Completed</div><div class="s-value">${doneQ}</div></div>
-      <div class="stat-card"><div class="s-label">Locations</div><div class="s-value">${locs.length + 1}</div></div>
+      <div class="stat-card"><div class="s-label">Locations</div><div class="s-value">${locCount}</div></div>
     `;
   }
 
   // ── QUOTES TABLE ──
   let allQuotes = [];
-  function renderQuotes(filter = '') {
-    allQuotes = getQuotes();
-    renderStats();
+  async function renderQuotes(filter = '') {
+    const { data, error } = await db
+      .from('quotes')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) { console.error('Error loading quotes:', error); return; }
+    allQuotes = data || [];
+    await renderStats();
+
     const tbody = document.getElementById('quotesBody');
-    let list = [...allQuotes].reverse();
+    let list = allQuotes;
     if (filter) {
       const f = filter.toLowerCase();
       list = list.filter(q =>
@@ -521,7 +597,7 @@
       const badge = q.status === 'new' ? 'badge-new' : q.status === 'read' ? 'badge-read' : 'badge-done';
       const label = q.status === 'new' ? 'New' : q.status === 'read' ? 'In Progress' : 'Done';
       return `<tr>
-        <td>${fmtDate(q.date)}</td>
+        <td>${fmtDate(q.created_at)}</td>
         <td><strong>${escHtml(q.full_name)}</strong></td>
         <td>${escHtml(q.company || '—')}</td>
         <td><a href="tel:${escHtml(q.phone)}" style="color:var(--blue)">${escHtml(q.phone)}</a></td>
@@ -540,34 +616,38 @@
 
   function filterQuotes(val) { renderQuotes(val); }
 
-  function markStatus(id, status) {
-    const quotes = getQuotes().map(q => q.id === id ? {...q, status} : q);
-    saveQuotes(quotes);
-    renderQuotes();
+  async function markStatus(id, status) {
+    const { error } = await db.from('quotes').update({ status }).eq('id', id);
+    if (error) { toast('Error updating status.', false); console.error(error); return; }
+    await renderQuotes();
     toast('Status updated.');
   }
 
-  function deleteQuote(id) {
+  async function deleteQuote(id) {
     if (!confirm('Delete this quote request?')) return;
-    saveQuotes(getQuotes().filter(q => q.id !== id));
-    renderQuotes();
+    const { error } = await db.from('quotes').delete().eq('id', id);
+    if (error) { toast('Error deleting quote.', false); console.error(error); return; }
+    await renderQuotes();
     toast('Quote deleted.');
   }
 
-  function clearAllQuotes() {
+  async function clearAllQuotes() {
     if (!confirm('Delete ALL quote requests? This cannot be undone.')) return;
-    saveQuotes([]);
-    renderQuotes();
+    const { error } = await db.from('quotes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    if (error) { toast('Error clearing quotes.', false); console.error(error); return; }
+    await renderQuotes();
     toast('All quotes cleared.');
   }
 
-  function viewQuote(id) {
-    const q = getQuotes().find(q => q.id === id);
+  async function viewQuote(id) {
+    const q = allQuotes.find(q => q.id === id);
     if (!q) return;
-    // Mark as read
-    markStatus(id, q.status === 'new' ? 'read' : q.status);
+    // Mark as read if new
+    if (q.status === 'new') {
+      await markStatus(id, 'read');
+    }
     document.getElementById('modalBody').innerHTML = `
-      <div class="detail-row"><div class="detail-label">Date</div><div class="detail-val">${fmtDate(q.date)}</div></div>
+      <div class="detail-row"><div class="detail-label">Date</div><div class="detail-val">${fmtDate(q.created_at)}</div></div>
       <div class="detail-row"><div class="detail-label">Full Name</div><div class="detail-val">${escHtml(q.full_name)}</div></div>
       <div class="detail-row"><div class="detail-label">Company</div><div class="detail-val">${escHtml(q.company||'—')}</div></div>
       <div class="detail-row"><div class="detail-label">Phone</div><div class="detail-val"><a href="tel:${escHtml(q.phone)}" style="color:var(--blue)">${escHtml(q.phone)}</a></div></div>
@@ -590,82 +670,177 @@
   document.getElementById('quoteModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 
   // ── LOCATIONS ──
-  function renderLocList() {
-    const locs = getLocs();
+  let allLocations = [];
+
+  async function renderLocList() {
+    const { data: locs, error } = await db
+      .from('locations')
+      .select('*');
+
+    if (error) { console.error('Error loading locations:', error); return; }
+
+    // Sort: Head Office first, then alphabetically by name — stable on edit
+    if (locs) {
+      locs.sort((a, b) => {
+        if (a.type === 'Head Office' && b.type !== 'Head Office') return -1;
+        if (a.type !== 'Head Office' && b.type === 'Head Office') return 1;
+        return (a.name || '').localeCompare(b.name || '');
+      });
+    }
+    allLocations = locs || [];
+
     const body = document.getElementById('locListBody');
     const pinSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+    const editSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
 
-    // Default always first
-    const defaultHtml = `
-      <div class="loc-list-item">
-        <div class="loc-list-pin">${pinSvg}</div>
-        <div class="loc-list-info">
-          <strong>Melbourne — Head Office</strong>
-          <span>Melbourne, VIC</span>
-        </div>
-        <span class="loc-default-badge">Default</span>
-      </div>`;
-
-    if (locs.length === 0) {
-      body.innerHTML = defaultHtml + `<div class="empty-state"><p style="font-size:0.85rem;">No additional locations added yet.</p></div>`;
+    if (!locs || locs.length === 0) {
+      body.innerHTML = `<div class="empty-state"><p style="font-size:0.85rem;">No locations found. Add one below.</p></div>`;
       return;
     }
 
-    body.innerHTML = defaultHtml + locs.map(loc => `
-      <div class="loc-list-item">
+    body.innerHTML = locs.map(loc => `
+      <div class="loc-list-item" style="flex-wrap:wrap;">
         <div class="loc-list-pin">${pinSvg}</div>
-        <div class="loc-list-info">
+        <div class="loc-list-info" style="flex:1; min-width:180px;">
           <strong>${escHtml(loc.name)}</strong>
-          <span>${escHtml(loc.address)}, ${escHtml(loc.suburb)} WA ${escHtml(loc.postcode)}</span>
+          <span>${escHtml(loc.address ? loc.address + ', ' : '')}${escHtml(loc.suburb)} ${escHtml(loc.state)} ${escHtml(loc.postcode)}</span>
+          <div style="font-size:0.75rem; color:var(--gray-mid); margin-top:4px; line-height:1.5;">
+            ${loc.phone ? `<span>📞 ${escHtml(loc.phone)}</span>` : ''}
+            ${loc.email ? `<span style="margin-left:8px;">✉ ${escHtml(loc.email)}</span>` : ''}
+            ${loc.hours ? `<br><span>🕐 ${escHtml(loc.hours)}</span>` : ''}
+          </div>
         </div>
-        <button class="action-btn btn-del" onclick="deleteLoc('${loc.id}')">Remove</button>
+        <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+          ${loc.type === 'Head Office' ? `<span class="loc-default-badge">Head Office</span>` : ''}
+          <button class="action-btn btn-mark" onclick="editLoc('${loc.id}')" style="display:flex;align-items:center;gap:4px;">${editSvg} Edit</button>
+          <button class="action-btn btn-del" onclick="deleteLoc('${loc.id}')">✕</button>
+        </div>
       </div>
     `).join('');
   }
 
-  function addLocation() {
+  function editLoc(id) {
+    const loc = allLocations.find(l => l.id === id);
+    if (!loc) return;
+
+    // Fill form with existing data
+    document.getElementById('locEditId').value = loc.id;
+    document.getElementById('locName').value = loc.name || '';
+    document.getElementById('locType').value = loc.type || 'Service Location';
+    document.getElementById('locAddress').value = loc.address || '';
+    document.getElementById('locSuburb').value = loc.suburb || '';
+    document.getElementById('locState').value = loc.state || 'VIC';
+    document.getElementById('locPostcode').value = loc.postcode || '';
+    document.getElementById('locPhone').value = loc.phone || '';
+    document.getElementById('locEmail').value = loc.email || '';
+    document.getElementById('locHours').value = loc.hours || '';
+    document.getElementById('locMaps').value = loc.directions || '';
+
+    // Switch form to edit mode
+    document.getElementById('locFormTitle').textContent = '✏ Edit Location';
+    document.getElementById('locSubmitBtn').textContent = 'Save Changes';
+    document.getElementById('locCancelBtn').style.display = 'block';
+
+    // Scroll form into view
+    document.getElementById('locFormTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function cancelEditLoc() {
+    document.getElementById('locEditId').value = '';
+    clearLocForm();
+    document.getElementById('locFormTitle').textContent = '+ Add New Location';
+    document.getElementById('locSubmitBtn').textContent = 'Add Location';
+    document.getElementById('locCancelBtn').style.display = 'none';
+  }
+
+  function clearLocForm() {
+    ['locName','locAddress','locSuburb','locPostcode','locPhone','locEmail','locHours','locMaps'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('locType').value = 'Depot';
+    document.getElementById('locState').value = 'VIC';
+  }
+
+  async function saveLocation() {
+    const editId   = document.getElementById('locEditId').value;
     const name     = document.getElementById('locName').value.trim();
     const type     = document.getElementById('locType').value;
     const address  = document.getElementById('locAddress').value.trim();
     const suburb   = document.getElementById('locSuburb').value.trim();
+    const state    = document.getElementById('locState').value;
     const postcode = document.getElementById('locPostcode').value.trim();
     const phone    = document.getElementById('locPhone').value.trim();
     const email    = document.getElementById('locEmail').value.trim();
     const hours    = document.getElementById('locHours').value.trim();
     const maps     = document.getElementById('locMaps').value.trim();
 
-    if (!name || !address || !suburb || !postcode) {
+    if (!name || !suburb || !postcode) {
       toast('Please fill in all required fields (*).', false);
       return;
     }
 
     const loc = {
-      id: 'loc_' + Date.now(),
-      name, type, address, suburb,
-      state: 'WA', postcode,
+      name, type, address, suburb, state, postcode,
       phone, email, hours,
       support: '',
-      directions: maps || `https://maps.google.com/?q=${encodeURIComponent(address + ' ' + suburb + ' WA ' + postcode)}`,
+      directions: maps || `https://maps.google.com/?q=${encodeURIComponent(address + ' ' + suburb + ' ' + state + ' ' + postcode)}`,
     };
 
-    const locs = getLocs();
-    locs.push(loc);
-    saveLocs(locs);
-    renderLocList();
-    renderStats();
-    toast('Location added! It now appears on the Locations page.');
+    if (editId) {
+      // UPDATE existing location
+      const { error } = await db.from('locations').update(loc).eq('id', editId);
+      if (error) { toast('Error updating location.', false); console.error(error); return; }
+      toast('Location updated!');
+    } else {
+      // INSERT new location
+      const { error } = await db.from('locations').insert([loc]);
+      if (error) { toast('Error adding location.', false); console.error(error); return; }
+      toast('Location added!');
+    }
 
-    // Clear form
-    ['locName','locAddress','locSuburb','locPostcode','locPhone','locEmail','locHours','locMaps'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('locType').value = 'Depot';
+    cancelEditLoc();
+    await renderLocList();
+    await renderStats();
   }
 
-  function deleteLoc(id) {
-    if (!confirm('Remove this location from the public page?')) return;
-    saveLocs(getLocs().filter(l => l.id !== id));
-    renderLocList();
-    renderStats();
+  async function deleteLoc(id) {
+    if (!confirm('Remove this location?')) return;
+    const { error } = await db.from('locations').delete().eq('id', id);
+    if (error) { toast('Error removing location.', false); console.error(error); return; }
+    // If we were editing this one, clear the form
+    if (document.getElementById('locEditId').value === id) cancelEditLoc();
+    await renderLocList();
+    await renderStats();
     toast('Location removed.');
+  }
+
+  // ── SITE SETTINGS ──
+  async function loadSettings() {
+    const { data, error } = await db.from('site_settings').select('*').eq('id', 1).single();
+    if (error || !data) { console.error('Error loading settings:', error); return; }
+    document.getElementById('settPhone').value = data.phone || '';
+    document.getElementById('settSupport').value = data.support_phone || '';
+    document.getElementById('settEmail').value = data.email || '';
+  }
+
+  async function saveSettings() {
+    const phone = document.getElementById('settPhone').value.trim();
+    const support_phone = document.getElementById('settSupport').value.trim();
+    const email = document.getElementById('settEmail').value.trim();
+
+    if (!phone || !email) {
+      toast('Phone and email are required.', false);
+      return;
+    }
+
+    const { error } = await db.from('site_settings').update({
+      phone, support_phone, email, updated_at: new Date().toISOString()
+    }).eq('id', 1);
+
+    if (error) { toast('Error saving settings.', false); console.error(error); return; }
+
+    toast('Settings saved! Changes will appear on the website.');
+    const saved = document.getElementById('settSaved');
+    saved.style.display = 'inline';
+    setTimeout(() => saved.style.display = 'none', 3000);
   }
 </script>
 </body>

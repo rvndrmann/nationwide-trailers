@@ -199,7 +199,7 @@
 <!-- PHONE BANNER -->
 <div class="phone-banner">
   <span>Call us anytime</span>
-  <a href="tel:1300XXXXXX">1300 XXX XXX</a>
+  <a href="tel:1300XXXXXX" data-site="phone">1300 XXX XXX</a>
 </div>
 
 <!-- AUSTRALIA MAP -->
@@ -294,6 +294,8 @@
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script>
   // ── Australia Map ──
   const map = L.map('aus-map', {
@@ -384,107 +386,81 @@
   const CLOCK_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
   const EMAIL_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`;
 
-  // Default nationwide locations (always shown)
-  const DEFAULT_LOCATIONS = [
-    {
-      id: 'default_melbourne',
-      name: 'Melbourne — Head Office',
-      type: 'Head Office',
-      address: '[Address Line 1]',
-      suburb: 'Melbourne',
-      state: 'VIC',
-      postcode: '3000',
-      phone: '1300 XXX XXX',
-      email: 'info@nationwidetrailers.com.au',
-      hours: 'Mon–Fri  7:00 AM – 5:00 PM AEST',
-      support: '24/7 Breakdown Support',
-      directions: 'https://maps.google.com/?q=Melbourne,VIC',
-      isDefault: true
-    },
-    {
-      id: 'default_sydney',
-      name: 'Sydney',
-      type: 'Service Location',
-      address: '[Address Line 1]',
-      suburb: 'Sydney',
-      state: 'NSW',
-      postcode: '2000',
-      phone: '1300 XXX XXX',
-      email: 'info@nationwidetrailers.com.au',
-      hours: 'Mon–Fri  7:00 AM – 5:00 PM AEST',
-      support: '24/7 Breakdown Support',
-      directions: 'https://maps.google.com/?q=Sydney,NSW',
-      isDefault: true
-    },
-    {
-      id: 'default_brisbane',
-      name: 'Brisbane',
-      type: 'Service Location',
-      address: '[Address Line 1]',
-      suburb: 'Brisbane',
-      state: 'QLD',
-      postcode: '4000',
-      phone: '1300 XXX XXX',
-      email: 'info@nationwidetrailers.com.au',
-      hours: 'Mon–Fri  7:00 AM – 5:00 PM AEST',
-      support: '24/7 Breakdown Support',
-      directions: 'https://maps.google.com/?q=Brisbane,QLD',
-      isDefault: true
-    },
-    {
-      id: 'default_perth',
-      name: 'Perth',
-      type: 'Service Location',
-      address: '[Address Line 1]',
-      suburb: 'Perth',
-      state: 'WA',
-      postcode: '6000',
-      phone: '1300 XXX XXX',
-      email: 'info@nationwidetrailers.com.au',
-      hours: 'Mon–Fri  7:00 AM – 5:00 PM AWST',
-      support: '24/7 Breakdown Support',
-      directions: 'https://maps.google.com/?q=Perth,WA',
-      isDefault: true
-    }
-  ];
-
-  function renderLocations() {
-    const grid = document.getElementById('locGrid');
-    const stored = JSON.parse(localStorage.getItem('nw_locations') || '[]');
-    const all = [...DEFAULT_LOCATIONS, ...stored];
-
-    if (all.length === 0) {
-      grid.innerHTML = `<div class="loc-empty">${PIN_SVG}<p>No locations found.</p></div>`;
-      return;
-    }
-
-    grid.innerHTML = all.map(loc => `
-      <div class="loc-card">
-        <div class="loc-card-header">
-          <div class="loc-icon">${PIN_SVG}</div>
-          <div>
-            <h3>${escHtml(loc.name)}</h3>
-            <p>${escHtml(loc.type || 'Service Location')}</p>
-          </div>
-        </div>
-        <div class="loc-card-body">
-          <div class="loc-detail">${PIN_SVG}<span>${escHtml(loc.address)}, ${escHtml(loc.suburb)} ${escHtml(loc.state)} ${escHtml(loc.postcode)}</span></div>
-          ${loc.phone ? `<div class="loc-detail">${PHONE_SVG}<span><a href="tel:${loc.phone.replace(/\s/g,'')}" style="color:inherit;">${escHtml(loc.phone)}</a></span></div>` : ''}
-          ${loc.email ? `<div class="loc-detail">${EMAIL_SVG}<span><a href="mailto:${escHtml(loc.email)}" style="color:inherit;">${escHtml(loc.email)}</a></span></div>` : ''}
-          ${loc.hours ? `<div class="loc-detail">${CLOCK_SVG}<span>${escHtml(loc.hours)}</span></div>` : ''}
-          ${loc.support ? `<div class="loc-detail">${CLOCK_SVG}<span style="color:var(--yellow-dark);font-weight:600;">${escHtml(loc.support)}</span></div>` : ''}
-        </div>
-        <div class="loc-card-footer">
-          <a href="${escHtml(loc.directions || 'https://maps.google.com/?q=' + encodeURIComponent(loc.address + ' ' + loc.suburb + ' ' + loc.state))}" target="_blank" rel="noopener" class="btn btn-outline">Get Directions</a>
-          <a href="contact.html" class="btn btn-primary">Get a Quote</a>
-        </div>
-      </div>
-    `).join('');
-  }
-
   function escHtml(str) {
     return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
+
+  // ── Fetch locations from Supabase and render ──
+  async function renderLocations() {
+    const grid = document.getElementById('locGrid');
+
+    // Show loading state
+    grid.innerHTML = `<div class="loc-empty" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray-mid);">Loading locations...</div>`;
+
+    try {
+      const { data: locs, error } = await db.from('locations').select('*');
+
+      if (error) throw error;
+
+      if (!locs || locs.length === 0) {
+        grid.innerHTML = `<div class="loc-empty">${PIN_SVG}<p>No locations found.</p></div>`;
+        return;
+      }
+
+      // Sort: Head Office first, then alphabetically by name — stays stable on edit
+      locs.sort((a, b) => {
+        if (a.type === 'Head Office' && b.type !== 'Head Office') return -1;
+        if (a.type !== 'Head Office' && b.type === 'Head Office') return 1;
+        return (a.name || '').localeCompare(b.name || '');
+      });
+
+      grid.innerHTML = locs.map(loc => {
+        const addrParts = [loc.address, loc.suburb, loc.state, loc.postcode].filter(Boolean);
+        const addrStr = loc.address
+          ? `${escHtml(loc.address)}, ${escHtml(loc.suburb)} ${escHtml(loc.state)} ${escHtml(loc.postcode)}`
+          : `${escHtml(loc.suburb)} ${escHtml(loc.state)} ${escHtml(loc.postcode)}`;
+        const directionsUrl = loc.directions || `https://maps.google.com/?q=${encodeURIComponent((loc.address ? loc.address + ', ' : '') + loc.suburb + ' ' + loc.state + ' ' + loc.postcode)}`;
+
+        return `
+          <div class="loc-card">
+            <div class="loc-card-header">
+              <div class="loc-icon">${PIN_SVG}</div>
+              <div>
+                <h3>${escHtml(loc.name)}</h3>
+                <p>${escHtml(loc.type || 'Service Location')}</p>
+              </div>
+            </div>
+            <div class="loc-card-body">
+              <div class="loc-detail">${PIN_SVG}<span>${addrStr}</span></div>
+              ${loc.phone ? `<div class="loc-detail">${PHONE_SVG}<span><a href="tel:${loc.phone.replace(/\s/g,'')}" style="color:inherit;">${escHtml(loc.phone)}</a></span></div>` : ''}
+              ${loc.email ? `<div class="loc-detail">${EMAIL_SVG}<span><a href="mailto:${escHtml(loc.email)}" style="color:inherit;">${escHtml(loc.email)}</a></span></div>` : ''}
+              ${loc.hours ? `<div class="loc-detail">${CLOCK_SVG}<span>${escHtml(loc.hours)}</span></div>` : ''}
+              ${loc.support ? `<div class="loc-detail">${CLOCK_SVG}<span style="color:var(--yellow-dark);font-weight:600;">${escHtml(loc.support)}</span></div>` : `<div class="loc-detail">${CLOCK_SVG}<span style="color:var(--yellow-dark);font-weight:600;">24/7 Breakdown Support</span></div>`}
+            </div>
+            <div class="loc-card-footer">
+              <a href="${escHtml(directionsUrl)}" target="_blank" rel="noopener" class="btn btn-outline">Get Directions</a>
+              <a href="contact.html" class="btn btn-primary">Get a Quote</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch (err) {
+      console.error('Failed to load locations:', err);
+      grid.innerHTML = `<div class="loc-empty">${PIN_SVG}<p>Unable to load locations. Please try again later.</p></div>`;
+    }
+  }
+
+  // ── Load site settings (phone/email) ──
+  (async () => {
+    try {
+      const { data } = await db.from('site_settings').select('*').eq('id', 1).single();
+      if (!data) return;
+      document.querySelectorAll('[data-site="phone"]').forEach(el => {
+        el.textContent = data.phone;
+        if (el.tagName === 'A') el.href = 'tel:' + data.phone.replace(/\s/g, '');
+      });
+    } catch(e) { /* defaults stay */ }
+  })();
 
   renderLocations();
 </script>
