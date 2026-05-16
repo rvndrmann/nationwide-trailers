@@ -254,8 +254,7 @@
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-logo">
-      <div class="sidebar-logo-main">Nationwide</div>
-      <div class="sidebar-logo-sub">Semi Trailer Hire</div>
+      <img src="images/nationwide-logo.png" alt="Nationwide Semi Trailer Hire" style="width:200px;height:auto;margin-bottom:8px;">
       <div class="sidebar-logo-badge">Admin Panel</div>
     </div>
     <nav class="sidebar-nav">
@@ -428,7 +427,7 @@
         <div class="loc-add-wrap">
           <h3 style="margin-bottom:20px;">Phone Numbers</h3>
           <div class="form-group">
-            <label>Main Phone Number *</label>
+            <label>Main Phone Number</label>
             <input type="text" id="settPhone" placeholder="1300 XXX XXX">
             <p style="font-size:0.75rem; color:var(--gray-mid); margin-top:4px;">Shown on all pages — header, footer, contact page</p>
           </div>
@@ -437,25 +436,22 @@
             <input type="text" id="settSupport" placeholder="1300 XXX XXX">
             <p style="font-size:0.75rem; color:var(--gray-mid); margin-top:4px;">Shown on the contact page for existing customers</p>
           </div>
+          <button class="submit-loc-btn" onclick="saveSetting('phone')" style="margin-top:12px;">Save Phone Numbers</button>
         </div>
 
         <!-- Email -->
         <div class="loc-add-wrap">
           <h3 style="margin-bottom:20px;">Email Address</h3>
           <div class="form-group">
-            <label>Main Email *</label>
+            <label>Main Email</label>
             <input type="email" id="settEmail" placeholder="info@nationwidetrailers.com.au">
             <p style="font-size:0.75rem; color:var(--gray-mid); margin-top:4px;">Shown on all pages — footer, contact page</p>
           </div>
+          <button class="submit-loc-btn" onclick="saveSetting('email')" style="margin-top:12px;">Save Email</button>
           <div style="background:var(--off-white); border:1px solid var(--gray-light); border-radius:6px; padding:16px; margin-top:20px;">
-            <p style="font-size:0.8rem; color:var(--gray-mid); line-height:1.5;"><strong style="color:var(--text-dark);">How it works:</strong> When you save changes here, the phone number and email will update across all pages on the website automatically.</p>
+            <p style="font-size:0.8rem; color:var(--gray-mid); line-height:1.5;"><strong style="color:var(--text-dark);">How it works:</strong> Changes saved here update across all pages on the website automatically.</p>
           </div>
         </div>
-      </div>
-
-      <div style="margin-top:20px; max-width:800px;">
-        <button class="submit-loc-btn" onclick="saveSettings()" style="max-width:260px;">Save Settings</button>
-        <span id="settSaved" style="display:none; margin-left:16px; color:var(--green); font-weight:600; font-size:0.9rem;">✓ Settings saved!</span>
       </div>
     </div>
 
@@ -821,26 +817,23 @@
     document.getElementById('settEmail').value = data.email || '';
   }
 
-  async function saveSettings() {
-    const phone = document.getElementById('settPhone').value.trim();
-    const support_phone = document.getElementById('settSupport').value.trim();
-    const email = document.getElementById('settEmail').value.trim();
+  async function saveSetting(type) {
+    const updates = { updated_at: new Date().toISOString() };
 
-    if (!phone || !email) {
-      toast('Phone and email are required.', false);
-      return;
+    if (type === 'phone') {
+      updates.phone = document.getElementById('settPhone').value.trim();
+      updates.support_phone = document.getElementById('settSupport').value.trim();
+      if (!updates.phone) { toast('Main phone number is required.', false); return; }
+    } else if (type === 'email') {
+      updates.email = document.getElementById('settEmail').value.trim();
+      if (!updates.email) { toast('Email is required.', false); return; }
     }
 
-    const { error } = await db.from('site_settings').update({
-      phone, support_phone, email, updated_at: new Date().toISOString()
-    }).eq('id', 1);
+    const { error } = await db.from('site_settings').update(updates).eq('id', 1);
 
     if (error) { toast('Error saving settings.', false); console.error(error); return; }
 
-    toast('Settings saved! Changes will appear on the website.');
-    const saved = document.getElementById('settSaved');
-    saved.style.display = 'inline';
-    setTimeout(() => saved.style.display = 'none', 3000);
+    toast(type === 'phone' ? 'Phone numbers saved!' : 'Email saved!');
   }
 </script>
 </body>
